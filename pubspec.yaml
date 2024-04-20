@@ -43,6 +43,9 @@ dependencies:
 
   flutter_colorpicker: ^1.0.3
 
+  expense_repository:
+    path: packages/expense_repository
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
