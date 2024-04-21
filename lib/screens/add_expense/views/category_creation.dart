@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expense_repository/expense_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tracker_app/screens/add_expense/blocs/create_category_bloc/create_category_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-getCategoryCreation(BuildContext context) {
+Future getCategoryCreation(BuildContext context) {
   return showDialog(
     context: context,
     builder: (ctx) {
@@ -16,6 +18,7 @@ getCategoryCreation(BuildContext context) {
       TextEditingController categoryNameController = TextEditingController();
       TextEditingController categoryIconController = TextEditingController();
       TextEditingController categoryColorController = TextEditingController();
+      Category category = Category.empty;
 
       List<String> myCategoriesIcons = [
         'entertainment',
@@ -35,7 +38,7 @@ getCategoryCreation(BuildContext context) {
           return BlocListener<CreateCategoryBloc, CreateCategoryState>(
             listener: (context, state) {
               if (state is CreateCategorySuccess) {
-                Navigator.pop(ctx);
+                Navigator.pop(ctx, category);
               } else if (state is CreateCategoryLoading) {
                 setState(() {
                   isLoading = true;
@@ -217,11 +220,13 @@ getCategoryCreation(BuildContext context) {
                                     },
                                   );
 
-                                  Category category = Category.empty;
-                                  category.categoryId = const Uuid().v1();
-                                  category.name = categoryNameController.text;
-                                  category.icon = iconSelected;
-                                  category.color = categoryColor.value;
+                                  setState(() {
+                                    category.categoryId = const Uuid().v1();
+                                    category.name = categoryNameController.text;
+                                    category.icon = iconSelected;
+                                    category.color = categoryColor.value;
+                                  });
+                                  // Category category = Category.empty;
                                   context
                                       .read<CreateCategoryBloc>()
                                       .add(CreateCategory(category));
