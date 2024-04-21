@@ -1,3 +1,4 @@
+import 'package:expense_repository/expense_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +17,9 @@ class _AddExpenseState extends State<AddExpense> {
   TextEditingController expenseController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  DateTime selectDate = DateTime.now();
+  // DateTime selectDate = DateTime.now();
+
+  late Expense expense;
 
   bool isLoading = false;
 
@@ -33,6 +36,7 @@ class _AddExpenseState extends State<AddExpense> {
   @override
   void initState() {
     dateController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    expense = Expense.empty;
     super.initState();
   }
 
@@ -89,17 +93,23 @@ class _AddExpenseState extends State<AddExpense> {
                       controller: categoryController,
                       decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white,
-                          prefixIcon: const Icon(
-                            FontAwesomeIcons.list,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
+                          fillColor: expense.category == Category.empty
+                              ? Colors.white
+                              : Color(expense.category.color),
+                          prefixIcon: expense.category == Category.empty
+                              ? const Icon(
+                                  FontAwesomeIcons.list,
+                                  size: 16,
+                                  color: Colors.grey,
+                                )
+                              : Image.asset(
+                                  'assets/${expense.category.icon}.png',
+                                  scale: 15,
+                                ),
                           suffixIcon: IconButton(
                               onPressed: () async {
                                 var newCategory =
                                     await getCategoryCreation(context);
-                                print(newCategory);
                                 setState(() {
                                   state.categories.insert(0, newCategory);
                                 });
@@ -130,6 +140,13 @@ class _AddExpenseState extends State<AddExpense> {
                           itemBuilder: (context, int i) {
                             return Card(
                               child: ListTile(
+                                onTap: () {
+                                  setState(() {
+                                    expense.category = state.categories[i];
+                                    categoryController.text =
+                                        expense.category.name;
+                                  });
+                                },
                                 leading: Image.asset(
                                   'assets/${state.categories[i].icon}.png',
                                   scale: 15,
@@ -154,7 +171,7 @@ class _AddExpenseState extends State<AddExpense> {
                       onTap: () async {
                         DateTime? newDate = await showDatePicker(
                             context: context,
-                            initialDate: selectDate,
+                            initialDate: expense.dateTime,
                             firstDate: DateTime.now(),
                             lastDate:
                                 DateTime.now().add(const Duration(days: 365)));
@@ -163,7 +180,8 @@ class _AddExpenseState extends State<AddExpense> {
                           setState(() {
                             dateController.text =
                                 DateFormat('dd/MM/yyyy').format(newDate);
-                            selectDate = newDate;
+                            // selectDate = newDate;
+                            expense.dateTime = newDate;
                           });
                         }
                       },
