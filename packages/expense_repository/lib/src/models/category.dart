@@ -5,7 +5,7 @@ class Category {
   String name;
   int totalExpense;
   String icon;
-  String color;
+  int color;
 
   Category({
     required this.categoryId,
@@ -16,7 +16,7 @@ class Category {
   });
 
   static final empty =
-      Category(categoryId: '', name: '', totalExpense: 0, icon: '', color: '');
+      Category(categoryId: '', name: '', totalExpense: 0, icon: '', color: 0);
 
   CategoryEntity toEntity() {
     return CategoryEntity(

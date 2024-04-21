@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:tracker_app/screens/add_expense/blocs/get_categories_bloc/get_categories_bloc.dart';
 import 'package:tracker_app/screens/add_expense/views/category_creation.dart';
 
 class AddExpense extends StatefulWidget {
@@ -100,9 +101,48 @@ class _AddExpenseState extends State<AddExpense> {
                           color: Colors.grey,
                         )),
                     hintText: "Category",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    border: const OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12)),
                         borderSide: BorderSide.none)),
+              ),
+              Container(
+                height: 200,
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: BlocBuilder<GetCategoriesBloc, GetCategoriesState>(
+                    builder: (context, state) {
+                      if (state is GetCategoriesSuccess) {
+                        return ListView.builder(
+                          itemCount: state.categories.length,
+                          itemBuilder: (context, int i) {
+                            return Card(
+                              child: ListTile(
+                                leading: Image.asset(
+                                  'assets/${state.categories[i].icon}.png',
+                                  scale: 15,
+                                ),
+                                title: Text(state.categories[i].name),
+                                tileColor: Color(state.categories[i].color),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                  ),
+                ),
               ),
               const SizedBox(
                 height: 16,
